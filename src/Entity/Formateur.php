@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\FormateurRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\FormateurRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass=FormateurRepository::class)
+ * @ApiResource()
  */
 class Formateur extends User
 {
@@ -14,11 +16,6 @@ class Formateur extends User
      * @ORM\Column(type="string", length=255)
      */
     private $specialite;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getSpecialite(): ?string
     {
