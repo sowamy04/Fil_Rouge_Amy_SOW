@@ -1,18 +1,30 @@
 <?php
 
 namespace App\Controller;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Admin;
+use App\Repository\AdminRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiController extends AbstractController
 {
     /**
-     * @Route("", name="", methods={""})
+     * @Route(
+     * "api/admins/users", 
+     * name="add_admin"
+     * )
      */
-    public function token()
+    public function ajouter_admin( AdminRepository $adminRepository)
     {
-        
+        $admins = $adminRepository->findAll();
+        foreach ($admins as $key => $admin) {
+            if ($admin->getProfils()->getLibelle() == "ADMIN") {
+                $allAdmins[] = $admin;
+            }
+        }
+
+        return $this->json("");
     }
 }

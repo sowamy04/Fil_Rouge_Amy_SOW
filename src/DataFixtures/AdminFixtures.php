@@ -28,6 +28,8 @@ class AdminFixtures extends Fixture implements DependentFixtureInterface
                   ->setEmail("admin".$i."@gmail.com")
                   ->setPassword($password)
                   ->setProfils($this->getReference(ProfilFixtures::ADMIN_REFERENCE))
+                  ->setStatut(1)
+                  ->setPhoto($faker->imageUrl(200,200))
             ;
             $manager->persist($admin);
         }

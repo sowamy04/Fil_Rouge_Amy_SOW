@@ -29,6 +29,8 @@ class CmFixtures extends Fixture implements DependentFixtureInterface
                   ->setPassword($password)
                   ->setPassword($password)
                   ->setProfils($this->getReference(ProfilFixtures::CM_REFERENCE))
+                  ->setStatut(1)
+                  ->setPhoto($faker->imageUrl(200,200))
             ;
             $manager->persist($cm);
         }

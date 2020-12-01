@@ -18,7 +18,9 @@ class ProfilFixtures extends Fixture
         $profils = array("ADMIN", "CM", "FORMATEUR", "APPRENANT");
         foreach ($profils as $key => $value) {
             $profil = new Profil();
-            $profil->setLibelle($value);
+            $profil->setLibelle($value)
+                    ->setIsExisting(true)
+            ;
             if ($value == "ADMIN") {
                 $this->addReference(self::ADMIN_REFERENCE, $profil);
             }
@@ -31,13 +33,8 @@ class ProfilFixtures extends Fixture
             else {
                 $this->addReference(self::APPRENANT_REFERENCE, $profil);
             }
-
-            
             $manager->persist($profil);
-    
         }
-            
-
         $manager->flush();
     }
 }

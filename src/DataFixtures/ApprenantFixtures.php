@@ -30,6 +30,8 @@ class ApprenantFixtures extends Fixture implements DependentFixtureInterface
                         ->setEmail("apprenant".$i."@gmail.com")
                         ->setPassword($password)
                         ->setProfils($this->getReference(ProfilFixtures::APPRENANT_REFERENCE))
+                        ->setStatut(1)
+                        ->setPhoto($faker->imageUrl(200,200))
             ;
             $manager->persist($apprenant);
         }
