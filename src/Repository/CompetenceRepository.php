@@ -19,6 +19,21 @@ class CompetenceRepository extends ServiceEntityRepository
         parent::__construct($registry, Competence::class);
     }
 
+    public function findGroupeCompetenceByReferentiel($id, $id2)
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.groupeCompetences', 'g')
+            ->innerJoin('g.referentiels', 'r')
+            ->andWhere('g.id = :val')
+            ->setParameter('val', $id2)
+            ->andWhere('r.id = :valeur')
+            ->setParameter('valeur', $id)
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Competence[] Returns an array of Competence objects
     //  */

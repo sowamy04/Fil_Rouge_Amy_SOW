@@ -17,6 +17,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *  attributes={
  *      "input_formats"={"json"={"application/ld+json", "application/json"}},
  *      "output_formats"={"json"={"application/ld+json", "application/json"}},
+ *      "deserialize"=false,
+ *        "swagger_context"={
+ *           "consumes"={
+ *              "multipart/form-data",
+ *             },
+ *             "parameters"={
+ *                "in"="formData",
+ *                "name"="file",
+ *                "type"="file",
+ *                "description"="The file to upload",
+ *              },
+*           },
  *     },
  *  collectionOperations={
  *      "lister_all_users":{
@@ -26,6 +38,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          "access_control"="(is_granted('ROLE_ADMIN'))",
  *          "access_control_message"="Vous n'avez pas access à cette Ressource",
  *      }, 
+ *      "add_user":{
+ *          "method" : "POST",
+ *          "path":"admin/users",
+ *          "normalization_context"={"groups":"user:read"},
+ *          "access_control"="(is_granted('ROLE_ADMIN'))",
+ *          "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *          "route_name" = "add_user",
+ *      },
  *  },
  *  itemOperations={
  *      "afficher_admin":{
@@ -34,6 +54,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          "normalization_context"={"groups":"user:read"},
  *          "access_control"="(is_granted('ROLE_ADMIN'))",
  *          "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *      },
+ *      "modifier_user":{
+ *          "method" : "PUT",
+ *          "path":"admin/users/{id}",
+ *          "normalization_context"={"groups":"user:read"},
+ *          "access_control"="(is_granted('ROLE_ADMIN'))",
+ *          "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *          "route_name" = "update_user"
  *      },
  *  }
  * )
@@ -44,13 +72,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read"})
+     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promo:write", "promoform:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read"})
+     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promoform:read"})
      */
     private $email;
 
@@ -64,25 +92,25 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "user:read", "groupe:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "user:read", "groupe:read", "promoform:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin:read", "formateur:read", "apprenant:read","profilUser:read", "user:read", "groupe:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read","profilUser:read", "user:read", "groupe:read", "promoform:read"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promoform:read", "user:read"})
      */
     private $telephone;
 
     /**
      * @ORM\Column(type="blob", nullable=true)
-     * @Groups({"user:read", "groupe:read"})
+     * @Groups({"user:read", "groupe:read", "profilUser:read"})
      */
     private $photo;
 
@@ -94,6 +122,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"apprenant:read"})
      */
     private $statut;
 
@@ -213,7 +242,12 @@ class User implements UserInterface
 
     public function getPhoto()
     {
-        return stream_get_contents($this->photo) ;
+        if ($this->photo != null) {
+            return base64_encode(stream_get_contents($this->photo));
+        }
+        else{
+            $this->photo;
+        }
     }
 
     public function setPhoto($photo): self

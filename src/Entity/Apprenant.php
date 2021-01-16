@@ -60,7 +60,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "normalization_context"={"groups":"apprenant:read"},
  *          "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_APPRENANT'))",
  *          "access_control_message"="Vous n'avez pas access à cette Ressource",
- *          "route_name":"update_apprenant"
+ *          "route_name" = "update_apprenant",
  *      },
  *  }
  * )
@@ -80,9 +80,15 @@ class Apprenant extends User
     private $adresse;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Groupe::class, mappedBy="apprenants")
+     * @ORM\ManyToMany(targetEntity=Groupe::class, mappedBy="apprenants", cascade={"persist"})
      */
     private $groupes;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @Groups({"apprenant:read"})
+     */
+    private $firstConnexion = false;
 
     public function __construct()
     {
@@ -136,6 +142,18 @@ class Apprenant extends User
         if ($this->groupes->removeElement($groupe)) {
             $groupe->removeApprenant($this);
         }
+
+        return $this;
+    }
+
+    public function getFirstConnexion(): ?bool
+    {
+        return $this->firstConnexion;
+    }
+
+    public function setFirstConnexion(bool $firstConnexion): self
+    {
+        $this->firstConnexion = $firstConnexion;
 
         return $this;
     }

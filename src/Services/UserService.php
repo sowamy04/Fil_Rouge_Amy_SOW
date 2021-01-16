@@ -9,9 +9,8 @@ use App\Repository\FormateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
+use Symfony\Component\Serializer\SerializerInterface;
 
 class UserService 
 {
@@ -22,8 +21,8 @@ class UserService
     private $apprenantRepo;
     private $cmRepo;
     private $adminRepo;
-    public function __construct(UserPasswordEncoderInterface $encoder, EntityManagerInterface $manager, 
-                                DenormalizerInterface $denormalizer, FormateurRepository $formateurRepository,
+    public function __construct(UserPasswordEncoderInterface $encoder, EntityManagerInterface $manager,
+    SerializerInterface $denormalizer, FormateurRepository $formateurRepository,
                                 ApprenantRepository $apprenantRepository, CmRepository $cmRepository, AdminRepository $adminRepository)
     {
         $this->encode = $encoder;
@@ -34,31 +33,58 @@ class UserService
         $this->cmRepo = $cmRepository;
         $this->adminRepo = $adminRepository;
     }
-    public function ajouter_user(Request $request, String $pf)
+    
+    /* public function ajouter_user(Request $request, String $pf)
     {
         $requete = $request->request->all();
         $photo= $request->files->get('photo');
-        $photo= fopen($photo->getRealPath(),"rb");
+        if ($photo) {
+            $photo= fopen($photo->getRealPath(),"rb");
+        }
      
         $class="";
        
         $profilTab = $this->manage->getRepository(Profil::class)->findAll();
         foreach ($profilTab as $profil) {
+            dd($profil);
             if ($profil->getLibelle() == $pf) {
                 if ($pf == "APPRENANT") {
                     $class="App\Entity\Apprenant";
+                    $password = "pass1234";
+                    $requete = $this->dn->denorma$requete = $this->dn->denormalize($requete, $class);
+                    $requete->setPassword($this->encode->encodePassword($requete, $requete->getPassword()));
+                    $requete->setProfils($profil);lize($requete,$class);
+                    $requete->setGenre("x")
+                            ->setAdresse("xxxx")
+                            ->setFirstConnexion(false)
+                            ->setPrenom("Apprenant")
+                            ->setNom("Apprenant")
+                            ->setTelephone("xx xxx xx xx")
+                            ->setPassword($this->encode->encodePassword($requete, $password))
+                            ->setProfils($profil);
+                    ;
                 }
 
                 else if ($pf == "FORMATEUR") {
                     $class="App\Entity\Formateur";
+                    $requete = $this->dn->denormalize($requete, $class);
+                    $requete->setSpecialite("Développeur web et/ou mobile et/ou CMS");
+                    $requete->setPassword($this->encode->encodePassword($requete, $requete->getPassword()));
+                    $requete->setProfils($profil);
                 }
 
                 else if ($pf == "CM") {
                     $class="App\Entity\Cm";
+                    $requete = $this->dn->denormalize($requete, $class);
+                    $requete->setPassword($this->encode->encodePassword($requete, $requete->getPassword()));
+                    $requete->setProfils($profil);
                 }
 
                 else if ($pf == "ADMIN") {
                     $class="App\Entity\Admin";
+                    $requete = $this->dn->denormalize($requete, $class, null);
+                    $requete->setPassword($this->encode->encodePassword($requete, $requete->getPassword()));
+                    $requete->setProfils($profil);
                 }
                 
                else{
@@ -67,9 +93,8 @@ class UserService
                 
             }
         }
-           $requete = $this->dn->denormalize($requete, $class, null);
+           
            $requete->setStatut(true);
-           $requete->setProfils($profil);
            $requete->setPhoto($photo);
            $requete->setPassword($this->encode->encodePassword($requete, $requete->getPassword()));
            $this->manage->persist($requete);
@@ -90,7 +115,6 @@ class UserService
         $pf = $requete["profil"];
         $photo= fopen($photo->getRealPath(),"rb");
         if ($class == "App\Entity\Formateur") {
-            $specialite = $requete['specialite'];
             $formateur = $this->formateurRepo->findOneBy(["id"=>$id]);
             $profilTab = $this->manage->getRepository(Profil::class)->findAll();
             foreach ($profilTab as $profil) {
@@ -98,7 +122,7 @@ class UserService
                     $formateur->setProfils($profil);
                 }
             }
-            $formateur->setSpecialite($specialite)
+            $formateur
                       ->setPrenom($prenom)
                       ->setNom($nom)
                       ->setTelephone($telephone)
@@ -112,14 +136,15 @@ class UserService
             $genre = $requete['genre'];
             $adresse = $requete['adresse'];
             $apprenant = $this->apprenantRepo->findOneBy(["id"=>$id]);
-            $profilTab = $this->manage->getRepository(Profil::class)->findAll();
+            $profilTab = $this->manage->getRepository(Profil::class)->findAll(); 
             foreach ($profilTab as $profil) {
-                if ($profil->getId() == intval($pf)) {
+                if ($profil->getId() == intval($pf)) { 
                     $apprenant->setProfils($profil);
                 }
             }
             $apprenant->setAdresse($adresse)
                       ->setGenre($genre)
+                      ->setFirstConnexion(true)
                       ->setPrenom($prenom)
                       ->setNom($nom)
                       ->setTelephone($telephone)
@@ -170,5 +195,122 @@ class UserService
         }
         $this->manage->flush();
         return true;
+    } */
+
+    /* public function ajouter_user($request, String $pf){
+        $requete = $request->request->all();
+        $photo= $request->files->get('photo');
+        if ($photo) {
+            $photo= fopen($photo->getRealPath(),"rb");
+        }
+        $profil = $this->profilRepository->findOneByLibelle($pf);
+        if ($profil->getLibelle() == $pf) {
+           
+            if ($pf == "APPRENANT"){
+                $class="App\\Entity\\Apprenant";
+                    $password = "pass1234";
+                    $requete = $this->serializer->denormalize($requete,$class);
+                    $requete->setGenre("x")
+                            ->setAdresse("xxxx")
+                            ->setFirstConnexion(false)
+                            ->setPrenom("Apprenant")
+                            ->setNom("Apprenant")
+                            ->setTelephone("xx xxx xx xx")
+                            ->setPassword($this->encoder->encodePassword($requete, $password))
+                            ->setProfils($profil);
+                    ;
+                }  else if ($pf == "FORMATEUR") {
+                        $class="App\\Entity\\Formateur";
+                        $requete = $this->serializer->denormalize($requete, $class);
+                        $requete->setSpecialite("Développeur web et/ou mobile et/ou CMS");
+                        $requete->setPassword($this->encoder->encodePassword($requete, $requete->getPassword()));
+                        $requete->setProfils($profil);
+                    }else if ($pf == "CM") {
+                        $class="App\Entity\Cm";
+                        $requete = $this->serializer->denormalize($requete, $class);
+                        $requete->setPassword($this->encoder->encodePassword($requete, $requete->getPassword()));
+                        $requete->setProfils($profil);
+                    }
+        
+                    else if ($pf == "ADMIN") {
+                        $class="App\\Entity\\Admin";
+                        $requete = $this->serializer->denormalize($requete, $class, null);
+                        $requete->setPassword($this->encoder->encodePassword($requete, $requete->getPassword()));
+                        $requete->setProfils($profil);
+                    }
+                    $requete->setStatut(true);
+                    if($photo){
+                        $requete->setPhoto($photo);
+                    }
+                    $this->manager->persist($requete);
+                    $this->manager->flush(); 
+                    return true;
+            }
     }
+
+    public function modification_user($request, $class, $id){
+        $requete = $request->request->all();
+        $prenom = $requete['prenom'];
+        $nom = $requete['nom'];
+        $email = $requete['email'];
+        $password = $requete['password'];
+        $telephone = $requete['telephone'];
+        $photo= $request->files->get('photo');
+        $pf = $requete["profil"];
+        $photo= fopen($photo->getRealPath(),"rb");
+        $user = $this->userRepository->findOneById($id);
+        if ($class == "App\Entity\Formateur") {
+            $specialite = $requete['specialite'];
+            $user->setSpecialite($specialite)
+                      ->setPrenom($prenom)
+                      ->setNom($nom)
+                      ->setTelephone($telephone)
+                      ->setEmail($email)
+                      ->setPassword($this->encode->encodePassword($user, $password))
+                      ->setStatut(true)
+                      ->setPhoto($photo)
+            ;
+        }
+        else if ($class == "App\Entity\Apprenant") {
+            $genre = $requete['genre'];
+            $adresse = $requete['adresse'];
+            $user->setAdresse($adresse)
+                      ->setGenre($genre)
+                      ->setPrenom($prenom)
+                      ->setNom($nom)
+                      ->setTelephone($telephone)
+                      ->setEmail($email)
+                      ->setPassword($this->encode->encodePassword($user, $password))
+                      ->setStatut(true)
+                      ->setPhoto($photo)
+            ;
+        }
+        elseif ($class == "App\Entity\Admin") {
+            $user
+                ->setPrenom($prenom)
+                ->setNom($nom)
+                ->setTelephone($telephone)
+                ->setEmail($email)
+                ->setPassword($this->encode->encodePassword($user, $password))
+                ->setStatut(true)
+                ->setPhoto($photo)
+            ;
+        }
+        elseif ($class == "App\Entity\Cm") {
+            $user
+                ->setPrenom($prenom)
+                ->setNom($nom)
+                ->setTelephone($telephone)
+                ->setEmail($email)
+                ->setPassword($this->encode->encodePassword($user, $password))
+                ->setStatut(true)
+                ->setPhoto($photo)
+            ;
+        }
+        else {
+            return false;
+        }
+        $this->manager->flush();
+        return true;
+    } */
 }

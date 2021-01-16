@@ -6,19 +6,37 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReferentielRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ReferentielRepository::class)
  * @ApiResource(
- *  itemOperations = {
+ *   attributes={
+ *      "input_formats"={"json"={"application/ld+json", "application/json"}},
+ *      "output_formats"={"json"={"application/ld+json", "application/json"}},
+ *      "deserialize"=false,
+ *        "swagger_context"={
+ *           "consumes"={
+ *              "multipart/form-data",
+ *             },
+ *             "parameters"={
+ *                "in"="formData",
+ *                "name"="file",
+ *                "type"="file",
+ *                "description"="The file to upload",
+ *              },
+*           },
+ *  },
+ *  collectionOperations = {
  *   "lister_referentiels":{
- *   "method": "GET",
- *   "path": "/admin/referentiels",
- *   "normalization_context"={"groups":"referentiel:read"},
- *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
- *   "access_control_message"="Vous n'avez pas accès à cette Ressource",
+ *    "method": "GET",
+ *    "path": "/admin/referentiels",
+ *    "normalization_context"={"groups":"ref:read"},
+ *    "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
+ *    "access_control_message"="Vous n'avez pas accès à cette Ressource",
  *  },
  *  "lister_groupecompetences_referentiels":{
  *   "method": "GET",
@@ -36,13 +54,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   "route_name" = "ajouter_referentiel",
  *  },
  * },
- *  collectionOperations = {
+ *  itemOperations = {
  *   "afficher_referentiel":{
- *   "method": "GET",
- *   "path": "/admin/referentiels/{id}",
- *   "normalization_context"={"groups":"referentiel:read"},
- *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
- *   "access_control_message"="Vous n'avez pas accès à cette Ressource",
+ *    "method": "GET",
+ *    "path": "/admin/referentiels/{id}",
+ *    "normalization_context"={"groups":"ref:read"},
+ *    "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
+ *    "access_control_message"="Vous n'avez pas accès à cette Ressource",
  *  },
  *  "afficher_groupecompetence_referentiel":{ 
  *   "method": "GET",
@@ -50,6 +68,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   "normalization_context"={"groups":"referentiel:read"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas accès à cette Ressource",
+ *   "route_name" = "lister_competences",
  *  },
  *  "update_referentiel":{
  *   "method": "PUT",
@@ -57,9 +76,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   "normalization_context"={"groups":"referentiel:read"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas accès à cette Ressource",
- *   "route_name" = "modifier_referentiel"
+ *   "route_name" = "modifier_referentiel",
  *  },
- *  }
+ *  },
  * )
  */
 class Referentiel
@@ -68,26 +87,47 @@ class Referentiel
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"referentiel:read"})
+     * @Groups({"referentiel:read", "ref:read", "promo:write", "promoref:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"referentiel:read"})
+     * @Groups({"referentiel:read", "ref:read", "promoref:read"})
      */
     private $libelle;
 
     /**
-     * @ORM\OneToMany(targetEntity=Promo::class, mappedBy="referentiels")
+     * @ORM\OneToMany(targetEntity=Promo::class, mappedBy="referentiels", cascade={"persist"})
      */
     private $promos;
 
     /**
-     * @ORM\ManyToMany(targetEntity=GroupeCompetence::class, inversedBy="referentiels")
+     * @ORM\ManyToMany(targetEntity=GroupeCompetence::class, inversedBy="referentiels", cascade={"persist"})
+     * @ApiSubresource()
      * @Groups({"referentiel:read"})
      */
     private $groupeCompetences;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $presentation;
+
+    /**
+     * @ORM\Column(type="blob")
+     */
+    private $programme;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $critereEvaluation;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $critereAdmission;
 
     public function __construct()
     {
@@ -162,6 +202,54 @@ class Referentiel
     public function removeGroupeCompetence(GroupeCompetence $groupeCompetence): self
     {
         $this->groupeCompetences->removeElement($groupeCompetence);
+
+        return $this;
+    }
+
+    public function getPresentation(): ?string
+    {
+        return $this->presentation;
+    }
+
+    public function setPresentation(string $presentation): self
+    {
+        $this->presentation = $presentation;
+
+        return $this;
+    }
+
+    public function getProgramme()
+    {
+        return stream_get_contents($this->programme);
+    }
+
+    public function setProgramme($programme): self
+    {
+        $this->programme = $programme;
+
+        return $this;
+    }
+
+    public function getCritereEvaluation(): ?string
+    {
+        return $this->critereEvaluation;
+    }
+
+    public function setCritereEvaluation(string $critereEvaluation): self
+    {
+        $this->critereEvaluation = $critereEvaluation;
+
+        return $this;
+    }
+
+    public function getCritereAdmission(): ?string
+    {
+        return $this->critereAdmission;
+    }
+
+    public function setCritereAdmission(string $critereAdmission): self
+    {
+        $this->critereAdmission = $critereAdmission;
 
         return $this;
     }

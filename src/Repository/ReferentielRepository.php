@@ -36,6 +36,19 @@ class ReferentielRepository extends ServiceEntityRepository
     }
     */
 
+    public function findGroupeCompetenceById($value)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.id = :val')
+            ->andWhere('gc.id = ')
+            ->setParameter('val', $value)
+            ->orderBy('r.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     /*
     public function findOneBySomeField($value): ?Referentiel
     {

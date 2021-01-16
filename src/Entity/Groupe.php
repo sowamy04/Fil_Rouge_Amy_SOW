@@ -13,11 +13,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=GroupeRepository::class)
  * @ApiResource(
- *  itemOperations = {
- *   "lister_groupes":{
+ *  attributes={
+ *      "input_formats"={"json"={"application/ld+json", "application/json"}},
+ *      "output_formats"={"json"={"application/ld+json", "application/json"}},
+ *  },
+ *  collectionOperations = {
+ *   "lister_groupes":{ 
  *   "method": "GET",
  *   "path": "/admin/groupes",
- *   "normalization_context"={"groups":"groupe:read"},
+ *   "normalization_context"={"groups":"grpe:read"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas access à cette Ressource",
  *  },
@@ -34,22 +38,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   "normalization_context"={"groups":"groupe:read"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *   "route_name" = "ajouter_groupe",
  *  },
  * },
- *  collectionOperations = {
+ *  itemOperations = {
  *   "afficher_groupe":{
  *   "method": "GET",
  *   "path": "/admin/groupes/{id}",
- *   "normalization_context"={"groups":"groupe:read"},
+ *   "normalization_context"={"groups":"grpe:read"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas access à cette Ressource",
  *  },
  *  "update_groupe":{
  *   "method": "PUT",
  *   "path": "/admin/groupes/{id}",
- *   "normalization_context"={"groups":"competence:read"},
+ *   "normalization_context"={"groups":"groupe:read"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *   "route_name" = "mofifier_groupe",
  *  },
  *  "remove_apprenant_groupe":{
  *   "method": "DELETE",
@@ -67,13 +73,13 @@ class Groupe
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"groupe:read"})
+     * @Groups({"groupe:read", "promo:write", "grpe:read", "promoform:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:read"})
+     * @Groups({"groupe:read", "grpe:read"})
      */
     private $libelle;
 
@@ -83,15 +89,26 @@ class Groupe
     private $promos;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="groupes")
-     * @Groups({"groupe:read"})
+     * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="groupes", cascade={"persist"})
+     * @Groups({"groupe:read", "promo:write"})
      */
     private $apprenants;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Formateur::class, inversedBy="groupes")
+     * @ORM\ManyToMany(targetEntity=Formateur::class, inversedBy="groupes", cascade={"persist"})
+     * @Groups({"promoform:read"})
      */
     private $formateurs;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $statut;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $type;
 
     public function __construct()
     {
@@ -172,6 +189,30 @@ class Groupe
     public function removeFormateur(Formateur $formateur): self
     {
         $this->formateurs->removeElement($formateur);
+
+        return $this;
+    }
+
+    public function getStatut(): ?bool
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(bool $statut): self
+    {
+        $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

@@ -3,62 +3,62 @@
 namespace App\Controller;
 
 use App\Entity\Apprenant;
-use App\Repository\ApprenantRepository;
-use App\Services\UserService;
+use App\Service\UserService ;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ApprenantController extends AbstractController
 {
-    private $UserService;
+    private $userService;
+
     public function __construct(UserService $userService)
     {
-        $this->UserService = $userService; 
+        $this->userService = $userService;
     }
 
     /**
      * @Route(
-     * "/api/apprenants",
+     * path="/api/apprenants",
      *  name="add_apprenant",
      *  methods={"POST"},
      *  defaults={
      *      "_controller"="\app\ControllerApprenantController::ajouter_apprenant",
      *      "_api_resource_class"=Apprenant::class,
-     *      "_api_collection_operation_name"="add_apprenant"
+     *      "_api_collection_operation_name"="ajouter_apprenant",
      *  }
      * )
      */
     public function ajouter_apprenant( Request $request)
     {
-        $profil = "APPRENANT";
-        if(  $this->UserService->ajouter_user($request, $profil)){
-            return $this->json("Apprenant ajouté avec succès!", 200);
+        
+        if($this->userService->ajout_utilisateur($request)){
+            return $this->json("Apprenant ajouté avec succès!", 201);
         }
-        return $this->json("Erreur lors de l'insertion!");
+        return $this->json("Erreur lors de l'insertion!",400); 
     
         
     }
-
+    
     /**
      * @Route(
-     * "/api/apprenants/{id}",
+     * path="/api/apprenants/{id}",
      *  name="update_apprenant",
      *  methods={"PUT"},
      *  defaults={
      *      "_controller"="\app\ControllerApprenantController::modifier_apprenant",
      *      "_api_resource_class"=Apprenant::class,
-     *      "_api_collection_operation_name"="modifier_apprenant"
+     *      "_api_collection_operation_name"="modifier_apprenant",
      *  }
      * )
      */
-    public function modifier_apprenant(int $id, Request $request, ApprenantRepository $apprenantRepository)
+    public function modifier_apprenant(int $id, Request $request)
     {
-        $class = "App\Entity\Apprenant";
-        if ($this->UserService->modification_user($request, $class, $id)) {
-            return $this->json('Vous avez modifé vos informations avec succès');
+        $class = "App\\Entity\\Apprenant";
+        if($this->userService->modification_user($request,$class,(int)$id)){
+            return $this->json('Vous avez modifé ces informations avec succès');
         }
         return $this->json("Erreur lors de la modification!");
     }
+    
 }
