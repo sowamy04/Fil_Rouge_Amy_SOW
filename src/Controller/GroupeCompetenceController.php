@@ -30,6 +30,7 @@ class GroupeCompetenceController extends AbstractController
         $grpeCompetenceInfo = json_decode($grpeCompetenceJson,true);
         $gprecompetence=new GroupeCompetence();
         $gprecompetence->setLibelle($grpeCompetenceInfo['libelle']);
+        $gprecompetence->setDescription($grpeCompetenceInfo['description']);
         if(count($grpeCompetenceInfo['competence']) == 0) {
             return $this->json("Veuillez ajouter au moins un niveau de compétence svp!");
         }
@@ -65,6 +66,7 @@ class GroupeCompetenceController extends AbstractController
         $grpeCompetenceJson = $request->getContent();
         $grpeCompetenceInfo = json_decode($grpeCompetenceJson,true);
         $gprecompetence->setLibelle($grpeCompetenceInfo['libelle']);
+        $gprecompetence->setDescription($grpeCompetenceInfo['description']);
         if(count($grpeCompetenceInfo['competence']) == 0) {
             return $this->json("Veuillez ajouter au moins un niveau de compétence svp!");
         }

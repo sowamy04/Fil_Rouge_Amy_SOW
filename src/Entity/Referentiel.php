@@ -87,20 +87,15 @@ class Referentiel
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"referentiel:read", "ref:read", "promo:write", "promoref:read"})
+     * @Groups({"referentiel:read", "ref:read", "promo:write", "promoref:read", "promo:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"referentiel:read", "ref:read", "promoref:read"})
+     * @Groups({"referentiel:read", "ref:read", "promoref:read", "promo:read"})
      */
     private $libelle;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Promo::class, mappedBy="referentiels", cascade={"persist"})
-     */
-    private $promos;
 
     /**
      * @ORM\ManyToMany(targetEntity=GroupeCompetence::class, inversedBy="referentiels", cascade={"persist"})
@@ -111,6 +106,7 @@ class Referentiel
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"referentiel:read"})
      */
     private $presentation;
 
@@ -121,13 +117,20 @@ class Referentiel
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"referentiel:read"})
      */
     private $critereEvaluation;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"referentiel:read"})
      */
     private $critereAdmission;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Promo::class, mappedBy="referentiels")
+     */
+    private $promos;
 
     public function __construct()
     {
@@ -148,36 +151,6 @@ class Referentiel
     public function setLibelle(string $libelle): self
     {
         $this->libelle = $libelle;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Promo[]
-     */
-    public function getPromos(): Collection
-    {
-        return $this->promos;
-    }
-
-    public function addPromo(Promo $promo): self
-    {
-        if (!$this->promos->contains($promo)) {
-            $this->promos[] = $promo;
-            $promo->setReferentiels($this);
-        }
-
-        return $this;
-    }
-
-    public function removePromo(Promo $promo): self
-    {
-        if ($this->promos->removeElement($promo)) {
-            // set the owning side to null (unless already changed)
-            if ($promo->getReferentiels() === $this) {
-                $promo->setReferentiels(null);
-            }
-        }
 
         return $this;
     }
@@ -250,6 +223,33 @@ class Referentiel
     public function setCritereAdmission(string $critereAdmission): self
     {
         $this->critereAdmission = $critereAdmission;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Promo[]
+     */
+    public function getPromos(): Collection
+    {
+        return $this->promos;
+    }
+
+    public function addPromo(Promo $promo): self
+    {
+        if (!$this->promos->contains($promo)) {
+            $this->promos[] = $promo;
+            $promo->addReferentiel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromo(Promo $promo): self
+    {
+        if ($this->promos->removeElement($promo)) {
+            $promo->removeReferentiel($this);
+        }
 
         return $this;
     }

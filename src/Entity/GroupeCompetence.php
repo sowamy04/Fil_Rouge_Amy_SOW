@@ -95,6 +95,12 @@ class GroupeCompetence
      */
     private $referentiels;
 
+    /**
+     * @ORM\Column(type="text")
+     * @Groups({"gc:read", "gprecompetence:read", "referentiel:read"})
+     */
+    private $description;
+
     public function __construct()
     {
         $this->competences = new ArrayCollection();
@@ -165,6 +171,18 @@ class GroupeCompetence
         if ($this->referentiels->removeElement($referentiel)) {
             $referentiel->removeGroupeCompetence($this);
         }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -41,6 +41,7 @@ class CompetenceController extends AbstractController
         $competenceInfo = json_decode($competenceJson,true);
        $competence=new Competence();
        $competence->setLibelle($competenceInfo['libelle']);
+       $competence->setStatut(true);
         if(count($competenceInfo['niveau']) == 0) {
             return $this->json("Veuillez ajouter au moins un niveau de compétence svp!");
         }
@@ -50,6 +51,7 @@ class CompetenceController extends AbstractController
         else{
              foreach ($competenceInfo['niveau'] as $niveau) {
                 $niveauxObj = $this->dn->denormalize($niveau, Niveau::class, true);
+                $niveauxObj->setStatut(true);
                 $em->persist($niveauxObj);
                 $competence->addNiveau($niveauxObj);
             }

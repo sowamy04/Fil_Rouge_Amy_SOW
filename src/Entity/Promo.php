@@ -125,19 +125,19 @@ class Promo
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"promoform:read", "promoref:read", "profil_sorties:read"})
+     * @Groups({"promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read"})
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
      */
     private $libelle;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read"})
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
      */
     private $description;
 
@@ -148,20 +148,57 @@ class Promo
     private $groupes;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Referentiel::class, inversedBy="promos", cascade={"persist"})
-     * @Groups({"promo:write", "promoref:read"})
-     */
-    private $referentiels;
-
-    /**
      * @ORM\ManyToMany(targetEntity=ProfilDeSortie::class, mappedBy="promo")
      */
     private $profilDeSorties;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $langue;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $lieu;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $referentAgate;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $fabrique;
+
+    /**
+     * @ORM\Column(type="date")
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $dateDebut;
+
+    /**
+     * @ORM\Column(type="date")
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $dateFin;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Referentiel::class, inversedBy="promos")
+     * @Groups({"promo:write", "promoform:read", "promoref:read", "profil_sorties:read", "promo:read"})
+     */
+    private $referentiels;
 
     public function __construct()
     {
         $this->groupes = new ArrayCollection();
         $this->profilDeSorties = new ArrayCollection();
+        $this->referentiels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -223,18 +260,6 @@ class Promo
         return $this;
     }
 
-    public function getReferentiels(): ?Referentiel
-    {
-        return $this->referentiels;
-    }
-
-    public function setReferentiels(?Referentiel $referentiels): self
-    {
-        $this->referentiels = $referentiels;
-
-        return $this;
-    }
-
     /**
      * @return Collection|ProfilDeSortie[]
      */
@@ -258,6 +283,102 @@ class Promo
         if ($this->profilDeSorties->removeElement($profilDeSorty)) {
             $profilDeSorty->removePromo($this);
         }
+
+        return $this;
+    }
+
+    public function getLangue(): ?string
+    {
+        return $this->langue;
+    }
+
+    public function setLangue(string $langue): self
+    {
+        $this->langue = $langue;
+
+        return $this;
+    }
+
+    public function getLieu(): ?string
+    {
+        return $this->lieu;
+    }
+
+    public function setLieu(string $lieu): self
+    {
+        $this->lieu = $lieu;
+
+        return $this;
+    }
+
+    public function getReferentAgate(): ?string
+    {
+        return $this->referentAgate;
+    }
+
+    public function setReferentAgate(string $referentAgate): self
+    {
+        $this->referentAgate = $referentAgate;
+
+        return $this;
+    }
+
+    public function getFabrique(): ?string
+    {
+        return $this->fabrique;
+    }
+
+    public function setFabrique(string $fabrique): self
+    {
+        $this->fabrique = $fabrique;
+
+        return $this;
+    }
+
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(\DateTimeInterface $dateDebut): self
+    {
+        $this->dateDebut = $dateDebut;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(\DateTimeInterface $dateFin): self
+    {
+        $this->dateFin = $dateFin;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Referentiel[]
+     */
+    public function getReferentiels(): Collection
+    {
+        return $this->referentiels;
+    }
+
+    public function addReferentiel(Referentiel $referentiel): self
+    {
+        if (!$this->referentiels->contains($referentiel)) {
+            $this->referentiels[] = $referentiel;
+        }
+
+        return $this;
+    }
+
+    public function removeReferentiel(Referentiel $referentiel): self
+    {
+        $this->referentiels->removeElement($referentiel);
 
         return $this;
     }

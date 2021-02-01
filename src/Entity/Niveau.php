@@ -26,13 +26,13 @@ class Niveau
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"competence:read", "comp:read"})
+     * @Groups({"competence:read", "comp:read", "competence:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"competence:read", "comp:read"})
+     * @Groups({"competence:read", "comp:read", "competence:read"})
      */
     private $libelle;
 
@@ -44,12 +44,13 @@ class Niveau
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"comp:read"})
+     * @Groups({"comp:read", "competence:read"})
      */
     private $critereEvaluation;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"competence:read"})
      */
     private $groupeAction;
 
