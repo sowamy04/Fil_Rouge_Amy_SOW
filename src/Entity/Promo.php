@@ -36,13 +36,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas access à cette Ressource",
  *  },
- *  "add_promo":{
+ *  "ajouter_promo":{
  *   "method": "POST",
  *   "path": "/admin/promo",
  *   "normalization_context"={"groups":"promo:read"},
  *   "denormalization_context" = {"groups" : "promo:write"},
  *   "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *   "access_control_message"="Vous n'avez pas access à cette Ressource",
+ *   "route_name" = "add_promo"
  *  },
  * },
  *  itemOperations = {
@@ -143,7 +144,7 @@ class Promo
 
     /**
      * @ORM\OneToMany(targetEntity=Groupe::class, mappedBy="promos", cascade={"persist"})
-     * @Groups({"promo:write", "promoform:read"})
+     * @Groups({"promo:write", "promoform:read", "profil_sorties:read"})
      */
     private $groupes;
 

@@ -65,7 +65,7 @@ class UserService {
                     $requete = $this->dn->denormalize($requete, $class);
                     $requete->setGenre("x")
                             ->setAdresse("xxxx")
-                            ->setFirstConnexion(false)
+                            ->setFirstConnexion(true)
                             ->setPrenom("Apprenant")
                             ->setNom("Apprenant")
                             ->setTelephone("xx xxx xx xx")
@@ -102,15 +102,17 @@ class UserService {
             $apprenant = $this->apprenantRepository->findOneBy(["id"=>$id]);
             $apprenant->setAdresse($adresse)
                       ->setGenre($genre)
-                      ->setFirstConnexion(true)
+                      ->setFirstConnexion(false)
                       ->setPrenom($prenom)
                       ->setNom($nom)
                       ->setTelephone($telephone)
                       ->setEmail($email)
-                      ->setPassword($this->encode->encodePassword($apprenant, $password))
                       ->setStatut(true)
                       ->setPhoto($photo)
             ;
+            if ($password) {
+                $apprenant->setPassword($this->encode->encodePassword($apprenant, $password));
+             }
         }
         else{
             $user = $this->userRepository->findOneBy(["id"=>$id]);
@@ -119,10 +121,12 @@ class UserService {
                 ->setNom($nom)
                 ->setTelephone($telephone)
                 ->setEmail($email)
-                ->setPassword($this->encode->encodePassword($user, $password))
                 ->setStatut(true)
                 ->setPhoto($photo)
             ;
+            if ($password) {
+               $user->setPassword($this->encode->encodePassword($user, $password));
+            }
         }
         $this->manage->flush();
         return true;

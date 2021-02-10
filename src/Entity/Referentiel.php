@@ -100,13 +100,13 @@ class Referentiel
     /**
      * @ORM\ManyToMany(targetEntity=GroupeCompetence::class, inversedBy="referentiels", cascade={"persist"})
      * @ApiSubresource()
-     * @Groups({"referentiel:read"})
+     * @Groups({"referentiel:read", "ref:read"})
      */
     private $groupeCompetences;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"referentiel:read"})
+     * @Groups({"referentiel:read", "ref:read"})
      */
     private $presentation;
 
@@ -115,22 +115,23 @@ class Referentiel
      */
     private $programme;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"referentiel:read"})
-     */
-    private $critereEvaluation;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"referentiel:read"})
-     */
-    private $critereAdmission;
 
     /**
      * @ORM\ManyToMany(targetEntity=Promo::class, mappedBy="referentiels")
      */
     private $promos;
+
+    /**
+     * @ORM\Column(type="text")
+     * @Groups({"referentiel:read", "ref:read"})
+     */
+    private $critereEvaluation;
+
+    /**
+     * @ORM\Column(type="text")
+     * @Groups({"referentiel:read", "ref:read"})
+     */
+    private $critereAdmission;
 
     public function __construct()
     {
@@ -203,30 +204,6 @@ class Referentiel
         return $this;
     }
 
-    public function getCritereEvaluation(): ?string
-    {
-        return $this->critereEvaluation;
-    }
-
-    public function setCritereEvaluation(string $critereEvaluation): self
-    {
-        $this->critereEvaluation = $critereEvaluation;
-
-        return $this;
-    }
-
-    public function getCritereAdmission(): ?string
-    {
-        return $this->critereAdmission;
-    }
-
-    public function setCritereAdmission(string $critereAdmission): self
-    {
-        $this->critereAdmission = $critereAdmission;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Promo[]
      */
@@ -250,6 +227,30 @@ class Referentiel
         if ($this->promos->removeElement($promo)) {
             $promo->removeReferentiel($this);
         }
+
+        return $this;
+    }
+
+    public function getCritereEvaluation(): ?string
+    {
+        return $this->critereEvaluation;
+    }
+
+    public function setCritereEvaluation(string $critereEvaluation): self
+    {
+        $this->critereEvaluation = $critereEvaluation;
+
+        return $this;
+    }
+
+    public function getCritereAdmission(): ?string
+    {
+        return $this->critereAdmission;
+    }
+
+    public function setCritereAdmission(string $critereAdmission): self
+    {
+        $this->critereAdmission = $critereAdmission;
 
         return $this;
     }

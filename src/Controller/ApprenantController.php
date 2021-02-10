@@ -31,7 +31,6 @@ class ApprenantController extends AbstractController
      */
     public function ajouter_apprenant( Request $request)
     {
-        
         if($this->userService->ajout_utilisateur($request)){
             return $this->json("Apprenant ajouté avec succès!", 201);
         }

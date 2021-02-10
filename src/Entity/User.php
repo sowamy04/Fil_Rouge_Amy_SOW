@@ -52,16 +52,23 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          "method" : "GET",
  *          "path":"admin/users/{id}",
  *          "normalization_context"={"groups":"user:read"},
- *          "access_control"="(is_granted('ROLE_ADMIN'))",
+ *          "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *          "access_control_message"="Vous n'avez pas access à cette Ressource",
  *      },
  *      "modifier_user":{
  *          "method" : "PUT",
  *          "path":"admin/users/{id}",
  *          "normalization_context"={"groups":"user:read"},
- *          "access_control"="(is_granted('ROLE_ADMIN'))",
+ *          "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR'))",
  *          "access_control_message"="Vous n'avez pas access à cette Ressource",
  *          "route_name" = "update_user"
+ *      },
+ *      "archiver_user" = {
+ *        "method" : "DELETE",
+ *        "path":"admin/users/{id}",
+ *        "normalization_context"={"groups":"user:read"},
+ *        "access_control"="(is_granted('ROLE_ADMIN'))",
+ *        "access_control_message"="Vous n'avez pas access à cette Ressource",
  *      },
  *  }
  * )
@@ -72,13 +79,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promo:write", "promoform:read"})
+     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promo:write", "promoform:read", "profil_sorties:read", "profilUser:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promoform:read"})
+     * @Groups({"user:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promoform:read", "profil_sorties:read", "profilUser:read"})
      */
     private $email;
 
@@ -87,30 +94,31 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"admin:read", "formateur:read", "apprenant:read", "user:read"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "user:read", "groupe:read", "promoform:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "user:read", "groupe:read", "promoform:read", "profil_sorties:read", "profilUser:read"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin:read", "formateur:read", "apprenant:read","profilUser:read", "user:read", "groupe:read", "promoform:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read","profilUser:read", "user:read", "groupe:read", "promoform:read", "profil_sorties:read", "profilUser:read"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promoform:read", "user:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read", "profilUser:read", "groupe:read", "promoform:read", "user:read", "profil_sorties:read", "profilUser:read"})
      */
     private $telephone;
 
     /**
      * @ORM\Column(type="blob", nullable=true)
-     * @Groups({"user:read", "groupe:read", "profilUser:read"})
+     * @Groups({"user:read", "groupe:read", "profilUser:read", "apprenant:read", "profilUser:read"})
      */
     private $photo;
 
@@ -122,7 +130,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"apprenant:read"})
+     * @Groups({"admin:read", "formateur:read", "apprenant:read", "user:read"})
      */
     private $statut;
 

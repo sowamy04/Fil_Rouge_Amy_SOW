@@ -64,20 +64,22 @@ class ReferentielController extends AbstractController
      * name="modifier_referentiel", 
      * methods={"PUT"},
      * defaults={
-     *      "_controller"="\app\ControllerReferentielController::modifier_groupe_competence",
+     *      "_controller"="\app\ControllerReferentielController::modifier_referentiel",
      *      "_api_resource_class"=Referentiel::class,
      *      "_api_collection_operation_name"="update_referentiel"
      *  }
      * )
      */
-    public function modifier_groupe_competence(Request $request, GroupeCompetenceRepository $groupecompetenceRepository, Referentiel $referentiel)
+    public function modifier_referentiel(Request $request, GroupeCompetenceRepository $groupecompetenceRepository, Referentiel $referentiel)
     {
         $em = $this->getDoctrine()->getManager();
         $requete = $request->request->all();
         $file= $request->files->get('programme');
-        $file= fopen($file->getRealPath(),"rb");
         $referentiel = $this->dn->denormalize($requete, Referentiel::class, true);
-        $referentiel->setProgramme($file);
+        if($file){
+            $file= fopen($file->getRealPath(),"rb");
+            $referentiel->setProgramme($file);
+        }
         if(count($requete['groupeCompetence']) == 0) {
             return $this->json("Veuillez ajouter au moins un groupe de compétence svp!");
         }
@@ -104,7 +106,7 @@ class ReferentielController extends AbstractController
                 }
             }
             
-            $em->persist($referentiel);
+            //$em->persist($referentiel);
             $em->flush();
             return new JsonResponse("Référentiel modifié avec succès en ajoutant/supprimant des groupes de compétences",Response::HTTP_CREATED,[],true);
         }

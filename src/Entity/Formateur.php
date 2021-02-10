@@ -9,17 +9,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 
 
-
 /**
  * @ORM\Entity(repositoryClass=FormateurRepository::class)
- * @ApiResource(
- *  collectionOperations = {
- *   "get"
- *  },
- *  itemOperations = {
- *    "get"
- *  }
- * )
  */
 class Formateur extends User
 {

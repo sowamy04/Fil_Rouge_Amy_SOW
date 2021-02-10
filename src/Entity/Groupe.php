@@ -73,13 +73,13 @@ class Groupe
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"groupe:read", "promo:write", "grpe:read", "promoform:read"})
+     * @Groups({"groupe:read", "promo:write", "grpe:read", "promoform:read", "profil_sorties:read", "apprenant:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"groupe:read", "grpe:read"})
+     * @Groups({"groupe:read", "grpe:read", "profil_sorties:read", "apprenant:read"})
      */
     private $libelle;
 
@@ -90,7 +90,7 @@ class Groupe
 
     /**
      * @ORM\ManyToMany(targetEntity=Apprenant::class, inversedBy="groupes", cascade={"persist"})
-     * @Groups({"groupe:read", "promo:write"})
+     * @Groups({"groupe:read", "promo:write", "profil_sorties:read"})
      */
     private $apprenants;
 

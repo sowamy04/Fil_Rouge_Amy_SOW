@@ -19,6 +19,7 @@ class TokenRewritten
         $data['statut'] = $user->getStatut();
         $data['prenom'] = $user->getPrenom();
         $data['photo'] = $user->getPhoto();
+        $data['id'] = $user->getId();
         if ($user->getProfils()->getLibelle() == "APPRENANT") {
             $data['firstConnexion'] = $user->getFirstConnexion();
         }

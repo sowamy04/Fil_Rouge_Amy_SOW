@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\ProfilDeSortie;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ApprenantRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -51,7 +52,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "method" : "GET",
  *          "path":"apprenants/{id}",
  *          "normalization_context"={"groups":"apprenant:read"},
- *          "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM'))",
+ *          "access_control"="(is_granted('ROLE_ADMIN') or is_granted('ROLE_FORMATEUR') or is_granted('ROLE_CM') or is_granted('ROLE_APPRENANT'))",
  *          "access_control_message"="Vous n'avez pas access à cette Ressource",
  *      },
  *  "modifier_apprenant":{
@@ -81,6 +82,7 @@ class Apprenant extends User
 
     /**
      * @ORM\ManyToMany(targetEntity=Groupe::class, mappedBy="apprenants", cascade={"persist"})
+     * @Groups({"apprenant:read"})
      */
     private $groupes;
 
@@ -90,9 +92,15 @@ class Apprenant extends User
      */
     private $firstConnexion = false;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=ProfilDeSortie::class, inversedBy="apprenants")
+     */
+    private $profilDeSorties;
+
     public function __construct()
     {
         $this->groupes = new ArrayCollection();
+        $this->profilDeSorties = new ArrayCollection();
     }
 
     public function getGenre(): ?string
@@ -154,6 +162,18 @@ class Apprenant extends User
     public function setFirstConnexion(bool $firstConnexion): self
     {
         $this->firstConnexion = $firstConnexion;
+
+        return $this;
+    }
+
+    public function getProfilDeSorties(): ?ProfilDeSortie
+    {
+        return $this->profilDeSorties;
+    }
+
+    public function setProfilDeSorties(?ProfilDeSortie $profilDeSorties): self
+    {
+        $this->profilDeSorties = $profilDeSorties;
 
         return $this;
     }

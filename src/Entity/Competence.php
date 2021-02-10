@@ -88,6 +88,7 @@ class Competence
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"competence:read"})
      */
     private $statut;
 
